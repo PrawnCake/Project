@@ -222,25 +222,38 @@ int main()
 	{
 		//obtain a sequence of points of the countour, pointed by the variable 'countour'
 		result = cvApproxPoly(contour, sizeof(CvContour), storage, CV_POLY_APPROX_DP, 5.0, 0);
-	
-		//if there are 3 vertices  in the contour and the area of the triangle is more than 100 pixels
 
 		if (fabs(cvContourArea(result, CV_WHOLE_SEQ))>100 && fabs(cvContourArea(result, CV_WHOLE_SEQ))<500000) 
 		{
 			//iterating through each point
+			double sumX = 0;
+			double sumY = 0;
 			CvPoint *pt1;
 			CvPoint *pt2;
+			
+			for (int i = 0; i < contour->total; i++)
+			{
+				pt1 = (CvPoint*)cvGetSeqElem(contour, i);
+				sumX += pt1->x;
+				sumY += pt1->y;
+			}
+			
+			
 			for (int i = 0; i<result->total; i++)
 			{
 				pt1 = (CvPoint*)cvGetSeqElem(result, i);
+				
 				if (i + 1 >= result->total)
 					pt2 = (CvPoint*)cvGetSeqElem(result, 0);
 				else
 					pt2 = (CvPoint*)cvGetSeqElem(result, i+1);
 			
-				cvLine(img, *pt1, *pt2, cvScalar(255, 0, 0), 4);
+				//cvLine(img, *pt1, *pt2, cvScalar(255, 0, 0), 4);
 				
 			}
+			int centroidX = sumX / contour->total;
+			int centroidY = sumY / contour->total;
+			cvCircle(img, CvPoint(centroidX, centroidY), 5, cvScalar(0, 255, 255),-1);
 			double area = cvContourArea(contour, CV_WHOLE_SEQ, 0);
 			identifyCorners(result,img,area);
 		}
